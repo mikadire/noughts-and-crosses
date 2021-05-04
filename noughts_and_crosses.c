@@ -6,39 +6,38 @@ char three_in_row(const char *board);
 int is_draw(const char *board);
 char *place_X(char *board);
 char *place_O(char *board);
+char *player(int n, char *board);
 
+//Constant values for 3 possible values of a square
 const char NOUGHTS = 'O';
 const char CROSSES = 'X';
 const char EMPTY = '-';
 	
 int main() {
-	//board initialised to 0s
+	
+	int n = 0;
 	char board[9];
 	
+	//board initialised to dashes
 	for (int i = 0; i < 9; i++) {
-		board[i] = '-';
+		board[i] = EMPTY;
 	}
 	
 	printf("\n");
 	print_board(board);
-	
-	//First player places 0
-	place_O(board);
-	printf("\n");
-	print_board(board);
-	
+
 	//play while not a win or draw
 	while (!three_in_row(board) && !is_draw(board)) {
 		
-		place_X(board);
+		player(n, board);
+		
 		printf("\n");
 		print_board(board);
 		
-		place_O(board);
-		printf("\n");
-		print_board(board);
+		n++;
 	}
 	
+	//winner set to flag value in three_in_row 
 	char winner = three_in_row(board);
 	
 	if (is_draw(board)) {
@@ -84,15 +83,19 @@ char *place_X(char *board) {
 	return board;
 }
 
-//choose player
-/*char *player(parameter) {
-
-}*/
+//Alternates between Xs and Os
+char *player(int n, char *board) {
+	if (n % 2 == 0) 
+		return place_O(board);
+	else	
+		return place_X(board);
+}
 
 void print_board(const char *board) {
 	
 	for (int i = 0; i < 9; i++) {
 		printf("%c ", board[i]);
+		//new line every third square
 		if ((i+1)%3 == 0)
 			printf("\n");
 	}
@@ -106,6 +109,7 @@ char three_in_row(const char *board) {
 	//Check row
 	for (int i = 0; i <= 6; i += 3) {
 		if (board[i] != EMPTY && board[i] == board[i+1] && board[i] == board[i+2]) {
+			//set flag to winning player
 			flag = board[i];
 		}
 	}
@@ -113,17 +117,20 @@ char three_in_row(const char *board) {
 	//Check column
 	for (int i = 0; i < 3; i++) {
 		if (board[i] != EMPTY && board[i] == board[i+3] && board[i] == board[i+6]) {
+			//set flag to winning player
 			flag = board[i];
 		}
 	}
 	
 	//Check diagonal left to right
 	if (board[0] != EMPTY && board[0] == board[4] && board[0] == board[8]) {
+		//set flag to winning player
 		flag = board[0];
 	}
 	
 	//Check diagonal right to left
 	if (board[2] != EMPTY && board[2] == board[4] && board[2] == board[6]) {
+		//set flag to winning player
 		flag = board[2];
 	}
 	return flag;

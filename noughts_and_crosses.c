@@ -23,6 +23,7 @@ int main() {
 		board[i] = EMPTY;
 	}
 	
+	printf("Welcome to noughts and crosses!\n");
 	printf("\n");
 	print_board(board);
 

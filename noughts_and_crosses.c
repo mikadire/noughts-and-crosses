@@ -1,48 +1,64 @@
 #include <stdio.h>
-#include <stdbool.h>
-
 
 //function declaration
-void print_board(int *board);
-int three_in_row(int *board);
-int is_draw(int *board);
-int *place_X(int *board);
-int *place_O(int *board);
+void print_board(const char *board);
+char three_in_row(const char *board);
+int is_draw(const char *board);
+char *place_X(char *board);
+char *place_O(char *board);
 
-const int NOUGHTS = 1;
-const int CROSSES = 2;
-const int EMPTY = 0;
+const char NOUGHTS = 'O';
+const char CROSSES = 'X';
+const char EMPTY = '-';
 	
 int main() {
 	//board initialised to 0s
-	int board[9] = {0}
+	char board[9];
 	
+	for (int i = 0; i < 9; i++) {
+		board[i] = '-';
+	}
+	
+	printf("\n");
+	print_board(board);
+	
+	//First player places 0
+	place_O(board);
 	printf("\n");
 	print_board(board);
 	
 	//play while not a win or draw
 	while (!three_in_row(board) && !is_draw(board)) {
-
+		
+		place_X(board);
+		printf("\n");
+		print_board(board);
+		
+		place_O(board);
+		printf("\n");
+		print_board(board);
 	}
 	
-	if (three_in_row) {
-		printf("Game over. %d has won!", winner);
+	char winner = three_in_row(board);
+	
+	if (is_draw(board)) {
+		printf("Game over. It's a draw!\n\n");
 	} else {
-		printf("Game over. It's a draw!);
+		printf("Game over. %c has won!\n\n", winner);
 	}
 	
 	return 0;
 }
 
-int *place_O(int *board) {
+char *place_O(char *board) {
 	
 	int pos_O;
 	
-	printf("Choose a position from 1-9 to place your O.\n");
+	printf("Choose a position from 1-9 to place your O: ");
 	
 	scanf("%d", &pos_O);
 	
-	if (board[pos_O-1] != 0) {
+	if (board[pos_O-1] != EMPTY) {
 		printf("This position has already been filled, please try another.\n");
 		place_O(board);
 	} else {
@@ -51,15 +67,15 @@ int *place_O(int *board) {
 	return board;
 }
 
-int *place_X(int *board) {
+char *place_X(char *board) {
 	
 	int pos_X;
 	
-	printf("Choose a position from 1-9 to place your X.\n");
+	printf("Choose a position from 1-9 to place your X: ");
 	
 	scanf("%d", &pos_X);
 	
-	if (board[pos_X-1] != 0) {
+	if (board[pos_X-1] != EMPTY) {
 		printf("This position has already been filled, please try another.\n");
 		place_X(board);
 	} else {
@@ -68,40 +84,55 @@ int *place_X(int *board) {
 	return board;
 }
 
-void print_board(int *board) {
+//choose player
+/*char *player(parameter) {
+
+}*/
+
+void print_board(const char *board) {
 	
 	for (int i = 0; i < 9; i++) {
-		printf("%d ", board[i]);
+		printf("%c ", board[i]);
 		if ((i+1)%3 == 0)
 			printf("\n");
 	}
 	printf("\n");	
 }
 
-int three_in_row(int *board) {
+char three_in_row(const char *board) {
 	
-	int flag = 0;
+	char flag = 0;
 	
-	for (int i = 0; i <= 6; i + 3) {
-		if (board[i] == board[i+1] && board[i] == board[i+2]) {
-			flag = 1;
+	//Check row
+	for (int i = 0; i <= 6; i += 3) {
+		if (board[i] != EMPTY && board[i] == board[i+1] && board[i] == board[i+2]) {
+			flag = board[i];
 		}
 	}
 	
+	//Check column
 	for (int i = 0; i < 3; i++) {
-		if (board[i] == board[i+3] && board[i] == board[i+6]) {
-			flag = 1;
+		if (board[i] != EMPTY && board[i] == board[i+3] && board[i] == board[i+6]) {
+			flag = board[i];
 		}
 	}
 	
-	if (board[0] == board[4] && board[0] == board[8])	flag = 1;
-	if (board[2] == board[4] && board[2] == board[6])	flag = 1;
+	//Check diagonal left to right
+	if (board[0] != EMPTY && board[0] == board[4] && board[0] == board[8]) {
+		flag = board[0];
+	}
 	
+	//Check diagonal right to left
+	if (board[2] != EMPTY && board[2] == board[4] && board[2] == board[6]) {
+		flag = board[2];
+	}
 	return flag;
 }
 
-int is_draw(int *board) {
+int is_draw(const char *board) {
 	for (int i = 0; i < 9; i++) {
+		//Empty square means no draw
 		if (board[i] == EMPTY)	return 0;
 	}
+	return 1;
 }

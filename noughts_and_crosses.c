@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 //function declaration
 void print_board(const char *board);
@@ -142,3 +143,26 @@ int is_draw(const char *board) {
 	}
 	return 1;
 }
+
+//X win = 1 (maximising)
+//O win = -1 (minimising)
+//Draw = 0
+
+int MinMax(char *board, int depth, maximisingPlayer) {
+	if (depth == 0 || value == 1) {
+		return value;
+	}
+	
+	if (maximizingPlayer) { 
+        	int value = -infinty;
+        	for (board) {
+            		value = max(value, MinMax(child, depth − 1, FALSE));
+            	}
+        	return value;
+        } else {
+        	int value = infinty;
+        	for () {
+            		value = min(value, MinMax(child, depth − 1, TRUE));
+            	}
+       		return value;	
+}	

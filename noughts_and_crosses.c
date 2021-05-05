@@ -30,6 +30,7 @@ int main() {
 	//play while not a win or draw
 	while (!three_in_row(board) && !is_draw(board)) {
 		
+		//alternates player
 		player(n, board);
 		
 		printf("\n");
@@ -38,13 +39,10 @@ int main() {
 		n++;
 	}
 	
-	//winner set to flag value in three_in_row 
-	char winner = three_in_row(board);
-	
 	if (is_draw(board)) {
 		printf("Game over. It's a draw!\n\n");
 	} else {
-		printf("Game over. %c has won!\n\n", winner);
+		printf("Game over. %c has won!\n\n", three_in_row(board));
 	}
 	
 	return 0;
@@ -84,12 +82,12 @@ char *place_X(char *board) {
 	return board;
 }
 
-//Alternates between Xs and Os
+//Alternates between players (assuming n is iterated)
 char *player(int n, char *board) {
 	if (n % 2 == 0) 
-		return place_O(board);
-	else	
 		return place_X(board);
+	else	
+		return place_O(board);
 }
 
 void print_board(const char *board) {

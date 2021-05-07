@@ -1,16 +1,15 @@
 #include <stdbool.h>
-#include <math.h>
 #include <stdio.h>
 
 //function declaration
-void print_board(const char board[]);
-char three_in_row(const char board[]);
-int is_draw(const char board[]);
 char *place_X(char *board);
 char *place_O(char *board);
 char *player(int n, char *board);
-char game_over(char board[]);
-char MinMax(char board, int depth, bool isMaximising);
+void print_board(const char board[]);
+char check_win(const char board[]);
+int eval(const char board[]);
+int MinMax(char board[], int truefalse);
+char *computerMove(char *board);
 
 //Constant values for 3 possible values of a square
 const char HUMAN = 'X';
@@ -32,7 +31,7 @@ int main() {
 	print_board(board);
 
 	//play while not a win or draw
-	while (!three_in_row(board) && !is_draw(board)) {
+	while (!check_win(board)) {
 		
 		//alternates player
 		player(n, board);
@@ -43,10 +42,11 @@ int main() {
 		n++;
 	}
 	
-	if (!is_draw(board)) {
+
+	if (check_win(board) == EMPTY) {
 		printf("Game over. It's a draw!\n\n");
 	} else {
-		printf("Game over. %c has won!\n\n", three_in_row(board));
+		printf("Game over. %c has won!\n\n", check_win(board));
 	}
 	
 	return 0;
@@ -66,6 +66,7 @@ char *place_X(char *board) {
 	} else {
 		board[pos_X-1] = HUMAN;
 	}
+	
 	return board;
 }
 
@@ -83,15 +84,17 @@ char *place_O(char *board) {
 	} else {
 		board[pos_O-1] = COMPUTER;
 	}
+	
 	return board;
 }
 
 //Alternates between players (assuming n is iterated)
 char *player(int n, char *board) {
-	if (n % 2 == 0) 
+	if (n % 2 == 0) {
 		return place_X(board);
-	else	
-		return computerMove;
+	} else {
+		return computerMove(board);
+	}
 }
 
 void print_board(const char board[]) {
@@ -147,7 +150,7 @@ char check_win(const char board[]) {
 		}
 	}
 
-	//return 
+	//return flag for win, EMPTY for draw, 0 for no
 	if (flag != 0) {
 		return flag;
 	} else if (space == 0) {
@@ -157,43 +160,58 @@ char check_win(const char board[]) {
 	}
 }
 
-int game_over(char board[]) {
-	if (check_win(board)) {
-		if (check_win(board) == HUMAN) {
-			return 1;
-		} else if (check_win(board) == COMPUTER) {
-			return -1;
-		} else {
-			return 0;
-		}
-	}
-	return 0;
-}
 
-char MinMax(char board, int depth, bool isMaximising) {
-	if (depth == 0 || game_over(board)) {
-		return game_over(board);
+//Only call if check_win != 0. HUMAN/X = 1, COMPUTER/O = -1, DRAW = 0
+int eval(const char board[]) {
+	
+	int score;
+	
+	if (check_win(board) == HUMAN) {
+		score = 1;
+	} else if (check_win(board) == COMPUTER) {
+		score = -1;
+	} else {
+		score = 0;
 	}
 	
-	if (isMaximising) { 
+	return score;
+}
+
+int MinMax(char board[], int truefalse) {
+	
+	if (check_win(board)) {
+		return eval(board);
+	}
+	
+	int bestScore, score;
+	
+	if (truefalse) { 
         	
-        	int bestScore = -infinty;
+        	bestScore = -1000;
         	
         	for (int i = 0; i < 9; i++) {
         		if (board[i] == EMPTY) {
         			board[i] = HUMAN;
-            			bestScore = max(bestScore, MinMax(board[], depth − 1, false));
+        			score = MinMax(board, 0);
+        			if (score > bestScore) {
+            				bestScore = score;
+            			}
+            			board[i] = EMPTY;
             		}
             	}
         	return bestScore;
 	} else {
         	
-        	int value = infinty;
+        	bestScore = 1000;
         
         	for (int i = 0; i < 9; i++) {
         		if (board[i] == EMPTY) {
         			board[i] = COMPUTER;
-            			bestScore = min(bestScore, MinMax(board[], depth − 1, true));
+        			score = MinMax(board, 1);
+        			if (score < bestScore) {
+            				bestScore = score;
+            			}
+            			board[i] = EMPTY;
             		}
             	}
        		return bestScore;	
@@ -202,14 +220,23 @@ char MinMax(char board, int depth, bool isMaximising) {
 
 char *computerMove(char *board) {
 	
-	int bestScore = infinity
+	int bestScore = 1000, score, move;
 	
 	for (int i = 0; i < 9; i++) {
-        		if (board[i] == EMPTY) {     			
-        			board[i] = COMPUTER;
-        			bestScore = min(bestScore, MinMax(board[], 0, true));
-        			board[i] = EMPTY;
-        			
-		
-		
-	
+        	if (board[i] == EMPTY) {     			
+        		board[i] = COMPUTER;
+        		score = MinMax(board, 1);
+        		if (score < bestScore) {
+        			bestScore = score;
+        			move = i;
+        		}
+        		board[i] = EMPTY;
+        	}
+        }
+        printf("bestScore = %d\n", bestScore);
+        board[move] = COMPUTER;
+        
+        return board;
+}
+        
+

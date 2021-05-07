@@ -233,7 +233,6 @@ char *computerMove(char *board) {
         		board[i] = EMPTY;
         	}
         }
-        printf("bestScore = %d\n", bestScore);
         board[move] = COMPUTER;
         
         return board;

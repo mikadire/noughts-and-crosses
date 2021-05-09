@@ -8,17 +8,19 @@ char *player(int n, char *board);
 void print_board(const char board[]);
 char check_win(const char board[]);
 int eval(const char board[]);
-int minimax(char board[], bool is_maxing);
+int minimax(char board[], int depth, bool is_maxing);
 char *computer_move(char *board);
 
 //Constant values for 3 possible values of a square
 const char HUMAN = 'X';
 const char COMPUTER = 'O';
 const char EMPTY = '-';
+//Positions calculated counter
+int POS = 0;
 	
 int main() {
 	
-	int n = 0;
+	int n = 0, total = 0;
 	char board[9];
 	
 	//board initialised to dashes
@@ -36,6 +38,9 @@ int main() {
 		//alternates player
 		player(n, board);
 		
+		//Add positions calculated for last move to total
+		total += POS;
+		
 		printf("\n");
 		print_board(board);
 		
@@ -50,6 +55,8 @@ int main() {
 	} else {
 		printf("Game over. The computer has won!\n\n");
 	}
+	
+	printf("The computer calculated a total of %d positions!\n\n", total / 2);
 	
 	return 0;
 }
@@ -180,7 +187,10 @@ int eval(const char board[]) {
 	return score;
 }
 
-int minimax(char board[], bool is_maxing) {
+int minimax(char board[], int depth, bool is_maxing) {
+	
+	//Counts calls. Used in computer_move
+	POS++;
 	
 	//If game is over, return result as score (1,0,-1)
 	if (check_win(board)) {
@@ -199,7 +209,7 @@ int minimax(char board[], bool is_maxing) {
 			//If spot is empty, place X there and run minimax for minimising player
         		if (board[i] == EMPTY) {
         			board[i] = HUMAN;
-        			score = minimax(board, false);
+        			score = minimax(board, depth + 1, false) - depth;
         			//If this move leads to a better result, update bestScore
 				if (score > bestScore) {
             				bestScore = score;
@@ -217,7 +227,7 @@ int minimax(char board[], bool is_maxing) {
         	for (int i = 0; i < 9; i++) {
         		if (board[i] == EMPTY) {
         			board[i] = COMPUTER;
-        			score = minimax(board, true);
+        			score = minimax(board, depth + 1, true) + depth;
         			if (score < bestScore) {
             				bestScore = score;
             			}
@@ -233,10 +243,13 @@ char *computer_move(char *board) {
 	//Computer is the minimising player to bestScore high
 	int bestScore = 100, score, move;
 	
+	//Incremented in minimax (counts call). Reset after each move
+	POS = 0;
+	
 	for (int i = 0; i < 9; i++) {
         	if (board[i] == EMPTY) {     			      		
 			board[i] = COMPUTER;
-        		score = minimax(board, true);       		
+        		score = minimax(board, 0, true);       		
 			if (score < bestScore) {
         			bestScore = score;
 				//Save the move if it leads to a better result
@@ -245,7 +258,7 @@ char *computer_move(char *board) {
         		board[i] = EMPTY;
         	}
         }
-
+	printf("I calculated %d positions to find this move!\n", POS);
         board[move] = COMPUTER;        
         return board;
 }
